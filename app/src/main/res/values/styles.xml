@@ -3,5 +3,11 @@
     <style name="Theme.LabManager" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">#142F4E</item>
+        <item name="android:navigationBarColor">#F6F8FB</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="colorPrimary">#1F6FB8</item>
+        <item name="colorSecondary">#4C8FC5</item>
+        <item name="android:windowActionModeOverlay">true</item>
     </style>
 </resources>
