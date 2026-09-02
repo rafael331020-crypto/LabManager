@@ -4,10 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.Gravity
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
@@ -25,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private val navy = Color.rgb(20, 47, 78)
     private val blue = Color.rgb(31, 111, 184)
     private val bg = Color.rgb(246, 248, 251)
-    private val text = Color.rgb(34, 43, 54)
+    private val darkText = Color.rgb(34, 43, 54)
     private val muted = Color.rgb(100, 112, 126)
 
     private fun data(k: String): MutableList<JSONObject> { val a = JSONArray(db.getString(k, "[]")); return MutableList(a.length()) { a.getJSONObject(it) } }
@@ -61,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun label(t: String) {
-        val v = TextView(this).apply { text = t; textSize = 15f; setTextColor(text); setPadding(dp(4), dp(10), dp(4), dp(10)) }
+        val v = TextView(this).apply { text = t; textSize = 15f; setTextColor(darkText); setPadding(dp(4), dp(10), dp(4), dp(10)) }
         root.addView(v)
     }
 
@@ -69,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         val c = MaterialCardView(this).apply { radius = dp(14).toFloat(); cardElevation = dp(2).toFloat(); setCardBackgroundColor(Color.WHITE); setContentPadding(dp(16), dp(14), dp(16), dp(14)) }
         val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         box.addView(TextView(this).apply { text = title; textSize = 13f; setTextColor(muted); setTypeface(null, Typeface.BOLD) })
-        box.addView(TextView(this).apply { text = body; textSize = 16f; setTextColor(text); setPadding(0, dp(5), 0, 0) })
+        box.addView(TextView(this).apply { text = body; textSize = 16f; setTextColor(darkText); setPadding(0, dp(5), 0, 0) })
         c.addView(box); root.addView(c, LinearLayout.LayoutParams(-1, -2).apply { setMargins(0, dp(6), 0, dp(6)) })
     }
 
