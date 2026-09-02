@@ -1,12 +1,12 @@
 package com.rafael.labmanager
 
-import android.app.DatePickerDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +31,7 @@ class StockActivity : AppCompatActivity() {
     private val muted = Color.rgb(91,106,122)
     private lateinit var list: LinearLayout
     private val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val repository get() = (application as LabManagerApp).repository
 
     private fun dp(v:Int)=(v*resources.displayMetrics.density).toInt()
     private fun tv(s:String,size:Float,color:Int,bold:Boolean=false)=TextView(this).apply{ text=s;textSize=size;setTextColor(color);if(bold)setTypeface(null,Typeface.BOLD) }
@@ -41,23 +42,18 @@ class StockActivity : AppCompatActivity() {
         val scroll=ScrollView(this).apply{setBackgroundColor(bg)}
         val root=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(14),dp(14),dp(14),dp(24))}
         scroll.addView(root);setContentView(scroll)
-
         val header=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL;setPadding(dp(16),dp(14),dp(16),dp(14));setBackgroundColor(navy)}
         val h=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL}
         h.addView(tv("LABMANAGER",12f,Color.WHITE,true));h.addView(tv("Estoque e materiais",20f,Color.WHITE,true).apply{setPadding(0,dp(3),0,0)})
         header.addView(h,LinearLayout.LayoutParams(0,-2,1f));header.addView(tv("OPERACIONAL",10f,Color.rgb(185,235,205),true));root.addView(header,LinearLayout.LayoutParams(-1,-2).apply{setMargins(0,0,0,dp(14))})
-
         root.addView(tv("Controle de estoque",21f,navy,true).apply{setPadding(dp(2),0,0,dp(3))})
         root.addView(tv("Lotes, validade, estoque mínimo e movimentações",12.5f,muted).apply{setPadding(dp(2),0,0,dp(12))})
-
         val metrics=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL}
         metric(metrics,"ITENS CADASTRADOS","0",blue,"items")
         metric(metrics,"ABAIXO DO MÍNIMO","0",red,"low")
         metric(metrics,"VALIDADE PRÓXIMA","0",orange,"expiry")
         root.addView(metrics)
-
-        val add=button("+ NOVO MATERIAL",blue){showItemDialog(null)}
-        root.addView(add,LinearLayout.LayoutParams(-1,dp(50)).apply{setMargins(0,dp(10),0,dp(12))})
+        root.addView(button("+ NOVO MATERIAL",blue){showItemDialog(null)},LinearLayout.LayoutParams(-1,dp(50)).apply{setMargins(0,dp(10),0,dp(12))})
         root.addView(tv("Inventário",18f,navy,true).apply{setPadding(dp(2),dp(6),0,dp(8))})
         list=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL};root.addView(list)
         root.addView(button("VOLTAR PARA GESTÃO",navy){finish()},LinearLayout.LayoutParams(-1,dp(50)).apply{setMargins(0,dp(18),0,0)})
@@ -72,14 +68,13 @@ class StockActivity : AppCompatActivity() {
     }
 
     private fun observeStock(){
-        lifecycleScope.launch { LabManagerApp.repository.stock().collectLatest { items ->
-            val metrics=items
+        lifecycleScope.launch { repository.stock().collectLatest { items ->
             updateMetric("items",items.size.toString())
-            updateMetric("low",items.count{it.quantity<=it.minimumQuantity}.toString())
-            updateMetric("expiry",items.count{nearExpiry(it.expiryDate)}.toString())
+            updateMetric("low",items.count { item -> item.quantity <= item.minimumQuantity }.toString())
+            updateMetric("expiry",items.count { item -> nearExpiry(item.expiryDate) }.toString())
             list.removeAllViews()
             if(items.isEmpty()) list.addView(tv("Nenhum material cadastrado.",13f,muted).apply{setPadding(dp(4),dp(16),dp(4),dp(16))})
-            items.forEach{addItemCard(it)}
+            items.forEach { item -> addItemCard(item) }
         }}
     }
 
@@ -103,10 +98,10 @@ class StockActivity : AppCompatActivity() {
         val statusColor=if(low)red else if(exp)orange else green
         top.addView(tv(status,9.5f,statusColor,true).apply{gravity=Gravity.END});box.addView(top)
         box.addView(tv("Lote ${item.lot}  •  Validade ${item.expiryDate}",12f,muted).apply{setPadding(0,dp(5),0,0)})
-        box.addView(tv("Saldo: ${item.quantity}  •  Mínimo: ${item.minimumQuantity}  •  Fornecedor: ${item.supplier.ifBlank{"—"}}",12f,muted).apply{setPadding(0,dp(4),0,dp(8) )})
+        box.addView(tv("Saldo: ${item.quantity}  •  Mínimo: ${item.minimumQuantity}  •  Fornecedor: ${item.supplier.ifBlank{"—"}}",12f,muted).apply{setPadding(0,dp(4),0,dp(8))})
         val actions=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL}
-        actions.addView(smallButton("ENTRADA",green){movement(item, true) },LinearLayout.LayoutParams(0,dp(42),1f).apply{setMargins(0,0,dp(5),0)})
-        actions.addView(smallButton("SAÍDA",red){movement(item, false)},LinearLayout.LayoutParams(0,dp(42),1f).apply{setMargins(dp(5),0,dp(5),0)})
+        actions.addView(smallButton("ENTRADA",green){movement(item,true)},LinearLayout.LayoutParams(0,dp(42),1f).apply{setMargins(0,0,dp(5),0)})
+        actions.addView(smallButton("SAÍDA",red){movement(item,false)},LinearLayout.LayoutParams(0,dp(42),1f).apply{setMargins(dp(5),0,dp(5),0)})
         actions.addView(smallButton("EDITAR",blue){showItemDialog(item)},LinearLayout.LayoutParams(0,dp(42),1f).apply{setMargins(dp(5),0,0,0)})
         box.addView(actions);card.addView(box);list.addView(card,LinearLayout.LayoutParams(-1,-2).apply{setMargins(0,dp(4),0,dp(4))})
     }
@@ -123,18 +118,17 @@ class StockActivity : AppCompatActivity() {
         d.setOnShowListener{d.getButton(-1).setOnClickListener{
             val n=name.text?.toString()?.trim().orEmpty();val l=lot.text?.toString()?.trim().orEmpty();val e=expiry.text?.toString()?.trim().orEmpty();val q=qty.text?.toString()?.toIntOrNull();val m=min.text?.toString()?.toIntOrNull();val s=supplier.text?.toString()?.trim().orEmpty()
             if(n.isBlank()||l.isBlank()||q==null||m==null||e.isBlank()){Toast.makeText(this,"Preencha os campos obrigatórios.",Toast.LENGTH_SHORT).show();return@setOnClickListener}
-            lifecycleScope.launch{LabManagerApp.repository.saveStock(StockItemEntity(existing?.id ?: UUID.randomUUID().toString(),n,l,e,q,m,s,now()));audit(if(existing==null)"CADASTRO_ESTOQUE" else "ALTERACAO_ESTOQUE",existing?.id ?: "novo");Toast.makeText(this@StockActivity,"Material salvo.",Toast.LENGTH_SHORT).show();d.dismiss()}
+            lifecycleScope.launch{repository.saveStock(StockItemEntity(existing?.id ?: UUID.randomUUID().toString(),n,l,e,q,m,s,now()));audit(if(existing==null)"CADASTRO_ESTOQUE" else "ALTERACAO_ESTOQUE",existing?.id ?: "novo");Toast.makeText(this@StockActivity,"Material salvo.",Toast.LENGTH_SHORT).show();d.dismiss()}
         }};d.show()
     }
 
     private fun movement(item:StockItemEntity,incoming:Boolean){
         val input=EditText(this).apply{hint="Quantidade";inputType=2}
-        val title=if(incoming)"Entrada de estoque" else "Saída de estoque"
-        androidx.appcompat.app.AlertDialog.Builder(this).setTitle(title).setMessage("${item.name} • lote ${item.lot}").setView(input).setNegativeButton("CANCELAR",null).setPositiveButton("CONFIRMAR"){_,_->
+        androidx.appcompat.app.AlertDialog.Builder(this).setTitle(if(incoming)"Entrada de estoque" else "Saída de estoque").setMessage("${item.name} • lote ${item.lot}").setView(input).setNegativeButton("CANCELAR",null).setPositiveButton("CONFIRMAR"){_,_->
             val amount=input.text.toString().toIntOrNull() ?: 0
             if(amount<=0){Toast.makeText(this,"Quantidade inválida.",Toast.LENGTH_SHORT).show();return@setPositiveButton}
             if(!incoming && amount>item.quantity){Toast.makeText(this,"Saldo insuficiente.",Toast.LENGTH_SHORT).show();return@setPositiveButton}
-            lifecycleScope.launch{LabManagerApp.repository.saveStock(item.copy(quantity=if(incoming)item.quantity+amount else item.quantity-amount,updatedAt=now()));audit(if(incoming)"ENTRADA_ESTOQUE" else "SAIDA_ESTOQUE",item.id);Toast.makeText(this@StockActivity,"Movimentação registrada.",Toast.LENGTH_SHORT).show()}
+            lifecycleScope.launch{repository.saveStock(item.copy(quantity=if(incoming)item.quantity+amount else item.quantity-amount,updatedAt=now()));audit(if(incoming)"ENTRADA_ESTOQUE" else "SAIDA_ESTOQUE",item.id);Toast.makeText(this@StockActivity,"Movimentação registrada.",Toast.LENGTH_SHORT).show()}
         }.show()
     }
 
@@ -143,5 +137,5 @@ class StockActivity : AppCompatActivity() {
     private fun smallButton(text:String,color:Int,click:()->Unit)=MaterialButton(this).apply{this.text=text;isAllCaps=false;textSize=11f;setTextColor(Color.WHITE);backgroundTintList=ColorStateList.valueOf(color);cornerRadius=dp(7);setOnClickListener{click()}}
     private fun now()=SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault()).format(Date())
     private fun nearExpiry(value:String):Boolean=try{val d=fmt.parse(value) ?: return false;val days=(d.time-Date().time)/(1000L*60*60*24);days in 0..60}catch(_:Exception){false}
-    private suspend fun audit(action:String,id:String){LabManagerApp.repository.audit(AuditEventEntity(UUID.randomUUID().toString(),"local-user",action,"STOCK",id,now(),"android"))}
+    private suspend fun audit(action:String,id:String){repository.audit(AuditEventEntity(UUID.randomUUID().toString(),"local-user",action,"STOCK",id,now(),"android"))}
 }
