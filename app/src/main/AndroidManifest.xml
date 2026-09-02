@@ -13,6 +13,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ProfessionalModulesActivity" android:exported="false" />
+        <activity android:name=".StockActivity" android:exported="false" />
         <activity android:name=".LisActivity" android:exported="false" />
         <activity android:name=".DashboardActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
