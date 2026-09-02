@@ -6,14 +6,16 @@
         android:label="LabManager LIS"
         android:allowBackup="false"
         android:supportsRtl="true">
-        <activity android:name=".LabDashboardActivity" android:exported="true">
+        <activity android:name=".EnterpriseDashboardActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".LabDashboardActivity" android:exported="false" />
         <activity android:name=".ProfessionalModulesActivity" android:exported="false" />
         <activity android:name=".StockActivity" android:exported="false" />
+        <activity android:name=".FinanceActivity" android:exported="false" />
         <activity android:name=".LisActivity" android:exported="false" />
         <activity android:name=".DashboardActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
