@@ -5,7 +5,7 @@
         android:label="LabManager LIS"
         android:allowBackup="true"
         android:supportsRtl="true">
-        <activity android:name=".LisDashboardActivity" android:exported="true">
+        <activity android:name=".LabDashboardActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
