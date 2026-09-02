@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
+        android:name=".LabManagerApp"
         android:theme="@style/Theme.LabManager"
         android:label="LabManager LIS"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:supportsRtl="true">
         <activity android:name=".LabDashboardActivity" android:exported="true">
             <intent-filter>
