@@ -31,7 +31,7 @@ class ProfessionalModulesActivity : AppCompatActivity() {
         module(root,"ATENDIMENTO","Pacientes • pedidos • convênios",blue){openLis()}
         module(root,"AMOSTRAS","Coleta • triagem • rejeição • recoleta",orange){openLis()}
         module(root,"ÁREA TÉCNICA","Resultados • conferência • liberação",green){openLis()}
-        module(root,"ESTOQUE","Itens • lotes • validade • mínimo",blue){openLis()}
+        module(root,"ESTOQUE","Itens • lotes • validade • mínimo",blue){startActivity(Intent(this,StockActivity::class.java))}
         module(root,"QUALIDADE","CIQ • não conformidades • auditoria",green){openLis()}
         module(root,"FINANCEIRO","Faturamento • contas • fluxo de caixa",orange){startActivity(Intent(this,FinanceActivity::class.java))}
         root.addView(tv("Visão operacional",20f,navy,true).apply{setPadding(dp(2),dp(18),0,dp(8))})
