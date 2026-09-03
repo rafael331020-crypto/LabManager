@@ -30,6 +30,7 @@ class StockActivity : AppCompatActivity() {
     private val bg = Color.rgb(244,247,250)
     private val muted = Color.rgb(91,106,122)
     private lateinit var list: LinearLayout
+    private lateinit var scroll: ScrollView
     private val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val repository get() = (application as LabManagerApp).repository
 
@@ -39,7 +40,7 @@ class StockActivity : AppCompatActivity() {
     override fun onCreate(state:Bundle?) { super.onCreate(state); render(); observeStock() }
 
     private fun render(){
-        val scroll=ScrollView(this).apply{setBackgroundColor(bg)}
+        scroll=ScrollView(this).apply{setBackgroundColor(bg)}
         val root=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(14),dp(14),dp(14),dp(24))}
         scroll.addView(root);setContentView(scroll)
         val header=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL;setPadding(dp(16),dp(14),dp(16),dp(14));setBackgroundColor(navy)}
@@ -78,10 +79,7 @@ class StockActivity : AppCompatActivity() {
         }}
     }
 
-    private fun updateMetric(key:String,value:String){
-        val root=findViewById<ScrollView>(android.R.id.content)?.getChildAt(0) ?: return
-        updateMetricRecursive(root,key,value)
-    }
+    private fun updateMetric(key:String,value:String){ updateMetricRecursive(scroll,key,value) }
     private fun updateMetricRecursive(v:View,key:String,value:String){
         if(v.tag==key && v is TextView)v.text=value
         if(v is ViewGroup)for(i in 0 until v.childCount)updateMetricRecursive(v.getChildAt(i),key,value)
