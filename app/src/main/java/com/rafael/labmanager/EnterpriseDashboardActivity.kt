@@ -238,7 +238,7 @@ class EnterpriseDashboardActivity : AppCompatActivity() {
             repository.results().collectLatest { resultsCount = it.size; renderHome() }
         }
         lifecycleScope.launchWhenStarted {
-            repository.stock().collectLatest { list -> stockLowCount = list.count { it.quantity <= it.minimumStock }; renderHome() }
+            repository.stock().collectLatest { list -> stockLowCount = list.count { it.quantity <= it.minimumQuantity }; renderHome() }
         }
     }
 }
